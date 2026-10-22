@@ -254,7 +254,7 @@ footer {
 /* Make the SVG resize with its container */
 .responsive-svg-container svg {
     display: block;
-    width: 100%;
+    max-width: 100%;
     height: auto;
     box-sizing: border-box;
 }

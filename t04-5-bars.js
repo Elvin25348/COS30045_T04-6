@@ -1,33 +1,63 @@
 
 // ==========================================
-// T04-5: Bind CSV data to SVG rectangles
+// T04-6: Bar chart with x and y scales
 // ==========================================
 
 const createBarChart = (data) => {
 
-    // 1. Create an SVG inside the responsive container.
+    // Step 1: Set the SVG coordinate system and display size
+    const viewW = 500;
+    const viewH = 1600;
+
+    const displayW = 640;
+    const displayH = 420;
+
+    // Create an SVG inside the responsive container
     const svg = d3.select(".responsive-svg-container")
         .append("svg")
-        .attr("viewBox", "0 0 1200 400")
+        .attr("viewBox", `0 0 ${viewW} ${viewH}`)
+        .attr("width", displayW)
+        .attr("height", displayH)
         .style("border", "1px solid black");
 
-    // 2. Bind the CSV data to rectangles.
-    svg
-        .selectAll("rect")
+
+    // Step 2: Linear scale for numeric x values
+    const xMax = d3.max(data, d => d.count);
+
+    const xScale = d3.scaleLinear()
+        .domain([0, xMax])
+        .range([0, viewW]);
+
+
+    // Step 3: Band scale for categorical y positions
+    const yScale = d3.scaleBand()
+        .domain(data.map(d => d.brand))
+        .range([0, viewH])
+        .paddingInner(0.2)
+        .paddingOuter(0.1);
+
+
+    // Step 4: Bind data and draw the bars
+    svg.selectAll("rect")
         .data(data)
         .join("rect")
 
-        // 3. Assign a class based on each count.
+        // Give each bar a class
         .attr("class", d => `bar bar-${d.count}`)
 
-        // 4. Set the bar width using the count.
-        .attr("width", d => d.count)
+        // Start each bar at the left edge
+        .attr("x", 0)
 
-        // 5. Give every bar the same height.
-        .attr("height", 16);
+        // Position each bar vertically by brand
+        .attr("y", d => yScale(d.brand))
 
-    // Note: x and y positions are intentionally not set.
-    // The bars overlap at this stage.
-    // Scaling and spacing will be developed in T04-6.
+        // Calculate bar width using the linear scale
+        .attr("width", d => xScale(d.count))
+
+        // Calculate bar height using the band scale
+        .attr("height", yScale.bandwidth())
+
+        // Set bar colour
+        .attr("fill", "steelblue");
 
 };
